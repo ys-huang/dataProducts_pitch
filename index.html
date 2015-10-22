@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>User Knowledge Modeling</title>
+  <meta name="description" content="">
+  <meta name="author" content="Sean Huang">
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="stylesheet" href="libraries/frameworks/RevealJS/css/reveal.min.css">
+  <link rel="stylesheet" href="libraries/frameworks/RevealJS/css/theme/default.css" id="theme">
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/default.css" id="theme">
+  <!--[if lt IE 9]>
+  <script src="lib/js/html5shiv.js"></script>
+  <![endif]-->  <link rel="stylesheet" href = "assets/css/ribbons.css">
+
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section class='' data-state='' id='slide-1'>
+  <h2>User Knowledge Modeling</h2>
+  <h3>Using K-means Clustering</h3>
+
+<hr>
+
+<p><a href="https://eg7649.shinyapps.io/developingDataProducts">https://eg7649.shinyapps.io/developingDataProducts</a>  </p>
+
+<p><span style="color:orange">SEAN HUANG</span>  </p>
+
+</section>
+<section class='' data-state='' id='slide-2'>
+  <h2>What does it do?</h2>
+  <ul>
+<li>This simple app aims to provide a <span style="color:yellow"><strong>visual tool</strong></span> for showing result of <span style="color:yellow"><strong>k-means altorithm</strong></span>.</li>
+<li>You can assign two attributes from datasets as well as cluster number you prefer.</li>
+<li>Server will do the calculation based on the attributes and cluster number you choose, and show you the result on a 2-dimention plot.</li>
+</ul>
+
+</section>
+<section class='class' data-state='' id='id'>
+  <h2>User Knowledge Modeling Dataset?</h2>
+  <ul>
+<li><p>It is the real dataset about the students&#39; knowledge status about the subject of Electrical DC Machines. The dataset had been obtained from Ph.D. Thesis.  </p></li>
+<li><p>Attribute information
+<font size=5></p>
+
+<ul>
+<li><em>STG: The degree of study time for goal object materails</em></li>
+<li><em>SCG: The degree of repetition number of user for goal object materails</em></li>
+<li><em>STR: The degree of study time of user for related objects with goal object</em></li>
+<li><em>LPR: The exam performance of user for related objects with goal object</em></li>
+<li><em>PEG: The exam performance of user for goal objects</em></li>
+<li><em>UNS: The knowledge level of user (output)</em></li>
+</ul>
+
+<p></font></p></li>
+<li><p>You can download the dataset <a href="https://archive.ics.uci.edu/ml/datasets/User+Knowledge+Modeling">here</a>.</p></li>
+</ul>
+
+</section>
+<section class='class' data-state='' id='id'>
+  <h2>How does it work?</h2>
+  <ol>
+<li>User select two attributes and cluster number</li>
+<li>UI pass it to server as parameters for kmeans calculation</li>
+<li>Draw a coloful plot accroding to the result</li>
+<li>Return the plot to the page so user can see what it will be according to his choice</li>
+</ol>
+
+<pre><code class="r">shinyServer(function(input, output, session) {
+  selectedData &lt;- reactive({
+    data[, c(input$xcol, input$ycol)] }) # select data accroding to user input
+  clusters &lt;- reactive({
+    kmeans(selectedData(), input$clusters) }) # do the calculation
+  output$plot1 &lt;- renderPlot({ # print colorful result
+    par(mar = c(5.1, 4.1, 0, 1))
+    plot(selectedData(), col = clusters()$cluster, pch = 20, cex = 3)
+    points(clusters()$centers, pch = 13, cex = 3, lwd = 4, col = &quot;#CC00CD&quot;) })
+})
+</code></pre>
+
+</section>
+<section class='' data-state='' id='slide-5'>
+  <h2>What will you see?</h2>
+  
+<div style='float:left;width:48%;' class='centered'>
+  <p>Choose STG vs. STR<br>
+4 cluster</p>
+
+<pre><code class="r">selectedData &lt;- data[, c(1,3)]
+clusters &lt;- kmeans(selectedData, 4)
+par(mar = c(5.1, 4.1, 0, 1))
+plot(selectedData, col = clusters$cluster, pch = 20, cex = 3)
+points(clusters$centers, pch = 13, cex = 3, lwd = 4, col = &quot;#CC00CD&quot;) 
+</code></pre>
+
+<p><img src="assets/fig/unnamed-chunk-3-1.png" alt="plot of chunk unnamed-chunk-3"> </p>
+
+<h1><img src="R1.png" alt="200"></h1>
+
+</div>
+<div style='float:right;width:48%;'>
+  <p>Choose SCG vs. STR<br>
+2 cluster</p>
+
+<pre><code class="r">selectedData &lt;- data[, 2:3]
+clusters &lt;- kmeans(selectedData, 2)
+par(mar = c(5.1, 4.1, 0, 1))
+plot(selectedData, col = clusters$cluster, pch = 20, cex = 3)
+points(clusters$centers, pch = 13, cex = 3, lwd = 4, col = &quot;#CC00CD&quot;) 
+</code></pre>
+
+<p><img src="assets/fig/unnamed-chunk-4-1.png" alt="plot of chunk unnamed-chunk-4"> </p>
+
+<h1><img src="R2.png" alt="200"></h1>
+
+</div>
+<div>
+  
+</div>
+</section>
+    </div>
+  </div>
+</body>
+  <script src="libraries/frameworks/RevealJS/lib/js/head.min.js"></script>
+  <script src="libraries/frameworks/RevealJS/js/reveal.min.js"></script>
+  <script>
+  // Full list of configuration options available here:
+  // https://github.com/hakimel/reveal.js#configuration
+  Reveal.initialize({
+    controls: true,
+    progress: true,
+    history: true,
+    center: true,
+    theme: Reveal.getQueryHash().theme || 'default', 
+    transition: Reveal.getQueryHash().transition || 'default', 
+    dependencies: [
+    // Cross-browser shim that fully implements classList -
+    // https://github.com/eligrey/classList.js/
+      { src: 'libraries/frameworks/RevealJS/lib/js/classList.js', condition: function() { return !document.body.classList;}},
+      // Zoom in and out with Alt+click
+      { src: 'libraries/frameworks/RevealJS/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+      // Speaker notes
+      { src: 'libraries/frameworks/RevealJS/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } },
+      // Remote control your reveal.js presentation using a touch device
+      //{ src: 'libraries/frameworks/RevealJS/plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+      ]
+  });
+  </script>  <!-- LOAD HIGHLIGHTER JS FILES -->
+<script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<!-- DONE LOADING HIGHLIGHTER JS FILES -->
+ 
+
+</html>
